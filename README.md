@@ -81,4 +81,8 @@ There is no time limit for how long the exercise should take for you to complete
 Please do not remove this section, it helps us a lot to have this information available.
 
 Template: scala-sbt
+
+## Running Tests
+
+Please use **sbt test** to run the test cases of the application.
     
