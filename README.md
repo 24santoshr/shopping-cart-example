@@ -82,6 +82,10 @@ Please do not remove this section, it helps us a lot to have this information av
 
 Template: scala-sbt
 
+## Running Main
+
+Please use **sbt run** to run the main function of the application. 
+
 ## Running Tests
 
 Please use **sbt test** to run the test cases of the application.
