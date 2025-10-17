@@ -14,16 +14,28 @@ import org.http4s.circe.CirceEntityCodec.circeEntityEncoder
 
 class CartServiceTest extends CatsEffectSuite {
 
+  val CORNFLAKES_JSON = "cornflakes.json"
+  val WEETABIX_JSON = "weetabix.json"
+  val SHREDDIES_JSON = "shreddies.json"
+  val FROSTIES_JSON = "frosties.json"
+
+  val PRODUCT_CORNFLAKES = "Corn Flakes"
+  val PRODUCT_WEETABIX = "Weetabix"
+  val PRODUCT_SHREDDIES = "Shreddies"
+  val PRODUCT_FROSTIES = "Frosties"
+
+  val localhostUrl = "http://localhost/"
+
   test("Add multiple items to cart and compute respective values") {
 
     val dummyProductData: HttpApp[IO] = HttpRoutes.of[IO] {
-      case GET -> Root / "cornflakes.json" =>
-        Ok(Product("Corn Flakes", 2.52))
-      case GET -> Root / "weetabix.json" =>
-        Ok(Product("Weetabix", 9.98))
+      case GET -> Root / CORNFLAKES_JSON =>
+        Ok(Product(PRODUCT_CORNFLAKES, 2.52))
+      case GET -> Root / WEETABIX_JSON =>
+        Ok(Product(PRODUCT_WEETABIX, 9.98))
     }.orNotFound
 
-    val localhostUrl = "http://localhost/"
+
     val mockClient: Client[IO] = Client.fromHttpApp(dummyProductData)
     val productService = new ProductService(mockClient, localhostUrl)
     val cartService = new CartService(productService)
@@ -31,7 +43,7 @@ class CartServiceTest extends CatsEffectSuite {
 
     for {
       cart1 <- cartService.addToCart(emptyCart, "cornflakes", 2)
-      cart2 <- cartService.addToCart(cart1, "weetabix", 1)
+      cart2 <- cartService.addToCart(cart1, PRODUCT_WEETABIX, 1)
     } yield {
       assertEquals(cart2.items.size, 2)
       assertEquals(cart2.cartSubtotal.setScale(2), BigDecimal(15.02))
@@ -43,18 +55,17 @@ class CartServiceTest extends CatsEffectSuite {
   test("Add single item to the cart and compute the values") {
 
     val dummyProductData: HttpApp[IO] = HttpRoutes.of[IO] {
-      case GET -> Root / "shreddies.json" =>
-        Ok(Product("Shreddies", 4.68))
+      case GET -> Root / SHREDDIES_JSON =>
+        Ok(Product(PRODUCT_SHREDDIES, 4.68))
     }.orNotFound
 
-    val localhostUrl = "http://localhost/"
     val mockClient: Client[IO] = Client.fromHttpApp(dummyProductData)
     val productService = new ProductService(mockClient, localhostUrl)
     val cartService = new CartService(productService)
     val emptyCart = Cart(Nil)
 
     for {
-      cart1 <- cartService.addToCart(emptyCart, "shreddies", 2)
+      cart1 <- cartService.addToCart(emptyCart, PRODUCT_SHREDDIES, 2)
     } yield {
       assertEquals(cart1.items.size, 1)
       assertEquals(cart1.cartSubtotal.setScale(2), BigDecimal(9.36))
@@ -66,18 +77,17 @@ class CartServiceTest extends CatsEffectSuite {
   test("Add zero quantity of an item to the cart and check the cart size") {
 
     val dummyProductData: HttpApp[IO] = HttpRoutes.of[IO] {
-      case GET -> Root / "frosties.json" =>
-        Ok(Product("Frosties", 4.99))
+      case GET -> Root / FROSTIES_JSON =>
+        Ok(Product(PRODUCT_FROSTIES, 4.99))
     }.orNotFound
 
-    val localhostUrl = "http://localhost/"
     val mockClient: Client[IO] = Client.fromHttpApp(dummyProductData)
     val productService = new ProductService(mockClient, localhostUrl)
     val cartService = new CartService(productService)
     val emptyCart = Cart(Nil)
 
     for {
-      cart1 <- cartService.addToCart(emptyCart, "frosties", 0)
+      cart1 <- cartService.addToCart(emptyCart, PRODUCT_FROSTIES, 0)
     } yield {
       assertEquals(cart1.items.size, 0)
     }
