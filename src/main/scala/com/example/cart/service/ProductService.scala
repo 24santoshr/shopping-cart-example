@@ -13,8 +13,12 @@ class ProductService(client: Client[IO],
 
   private val JSON_EXTENSION = "json"
 
+  def getUrl(productName: String): Uri = {
+    Uri.unsafeFromString(s"$baseUrl${productName.toLowerCase}.$JSON_EXTENSION")
+  }
+
   def getProductData(productName: String): IO[Product] = {
-    val fullProductUrl = Uri.unsafeFromString(s"$baseUrl${productName.toLowerCase}.$JSON_EXTENSION")
+    val fullProductUrl = getUrl(productName)
     client.expect[Product](fullProductUrl)
   }
 }

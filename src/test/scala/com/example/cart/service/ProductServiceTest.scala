@@ -56,4 +56,16 @@ class ProductServiceTest extends CatsEffectSuite {
       assert(result.isLeft)
     }
   }
+
+  test("getUrl should construct correct URL") {
+    val productService = new ProductService(null.asInstanceOf[Client[IO]], localhostUrl)
+
+    assertEquals(productService.getUrl("cornflakes"), Uri.unsafeFromString("http://localhost/cornflakes.json"))
+    assertEquals(productService.getUrl("Weetabix"), Uri.unsafeFromString("http://localhost/weetabix.json"))
+  }
+
+  test("getUrl should handle empty product name") {
+    val productService = new ProductService(null.asInstanceOf[Client[IO]], localhostUrl)
+    assertEquals(productService.getUrl(""), Uri.unsafeFromString("http://localhost/.json"))
+  }
 }
